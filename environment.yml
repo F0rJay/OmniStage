@@ -1,0 +1,14 @@
+# Conda 开发环境：提供 Node.js / npm，与系统 PATH 解耦。
+# 使用方式见 README「Conda 开发环境」。
+#
+# 新建环境：conda env create -f environment.yml
+# 已有 canonweave：conda env update -f environment.yml --prune
+#
+# JavaScript 库仍由仓库根目录 npm install 安装到 node_modules（与 Conda 互补，不冲突）。
+
+name: canonweave
+channels:
+  - conda-forge
+dependencies:
+  # LTS 方向；含 npm。构建 Next / better-sqlite3 需要 Node 18+
+  - nodejs >=22,<25

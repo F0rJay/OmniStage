@@ -1,0 +1,17 @@
+{
+  "name": "canonweave",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "mcp-servers/*"
+  ],
+  "scripts": {
+    "dev:web": "npm --workspace @canonweave/web run dev",
+    "build:mcp-dice": "npm run build --workspace @canonweave/mcp-dice-roller",
+    "build:mcp-world": "npm run build --workspace @canonweave/mcp-world-tools",
+    "build:web": "npm --workspace @canonweave/web run build",
+    "build:all": "npm run build:mcp-dice && npm run build:mcp-world && npm run build:web",
+    "start:web": "npm --workspace @canonweave/web run start"
+  }
+}

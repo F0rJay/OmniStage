@@ -1,0 +1,17 @@
+# 仅启动 LiteLLM Proxy（无 Postgres，适合本地开发）
+# 用法：docker compose -f docker-compose.litellm.yml up
+#
+# 复制 infra/litellm/.env.example -> infra/litellm/.env 并填写 Key
+
+services:
+  litellm:
+    image: ghcr.io/berriai/litellm:main-stable
+    ports:
+      - "4000:4000"
+    env_file:
+      - ./infra/litellm/.env
+    volumes:
+      - ./infra/litellm/config.yaml:/app/config.yaml
+    command:
+      - "--config=/app/config.yaml"
+      - "--port=4000"

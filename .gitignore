@@ -1,0 +1,44 @@
+## Dependencies
+node_modules/
+
+## Build outputs
+.next/
+out/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+## Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+## Environment and secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+apps/web/.env.local
+infra/litellm/.env
+
+## Local databases and runtime data
+data/*.sqlite
+data/*.sqlite-*
+*.db
+*.sqlite
+*.sqlite-*
+
+## OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+## Python local env (repo has environment.yml)
+.venv/
+venv/
+__pycache__/
+*.pyc

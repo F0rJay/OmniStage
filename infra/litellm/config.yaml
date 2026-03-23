@@ -1,0 +1,23 @@
+# LiteLLM Proxy 模型路由（model_name 须与 apps/web/src/lib/models.ts 中 litellm 的 modelId 一致）
+# 上游 Key 来自同目录 .env（docker compose 注入），勿把真实 Key 写进本文件提交仓库。
+
+model_list:
+  - model_name: deepseek-chat
+    litellm_params:
+      model: deepseek/deepseek-chat
+      api_key: os.environ/DEEPSEEK_API_KEY
+
+  - model_name: gpt-4o-mini
+    litellm_params:
+      model: gpt-4o-mini
+      api_key: os.environ/OPENAI_API_KEY
+
+  - model_name: gpt-4.1
+    litellm_params:
+      model: gpt-4.1
+      api_key: os.environ/OPENAI_API_KEY
+
+  - model_name: claude-sonnet
+    litellm_params:
+      model: claude-sonnet-4-20250514
+      api_key: os.environ/ANTHROPIC_API_KEY
