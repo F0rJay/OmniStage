@@ -128,7 +128,7 @@ npm run dev:web
 
 启动后打开：`http://localhost:3000`
 
-### B. 接入真实模型（LiteLLM 代理）
+### B. 接入真实模型（LiteLLM 代理，推荐）
 
 1. 复制并填写 LiteLLM 环境变量  
 2. 启动 LiteLLM 容器  
@@ -149,6 +149,27 @@ npm run dev:web
 
 > 详细配置见 `docs/litellm.md`。  
 > 如果你不想走 LiteLLM，也可以在 `apps/web/.env.local` 直接填 `OPENAI_API_KEY` / `DEEPSEEK_API_KEY` / `ANTHROPIC_API_KEY`。
+
+### C. 在前端配置你自己的模型接口（已支持）
+
+你可以不改代码，直接在前端配置并切换模型接口：
+
+1. 打开 `个人偏好`（`/profile`）
+2. 在“自定义 OpenAI 兼容接口”中填写：
+   - 名称
+   - Base URL（需含 `/v1` 或兼容路径）
+   - API Key
+   - 默认模型 ID
+3. 保存后，该接口会出现在模型下拉中，可设为新会话默认模型或在会话内切换
+
+当前内置一键预设（填 Key 即可）：
+
+- DeepSeek 官方
+- Qwen（阿里百炼）
+- Kimi（月之暗面）
+- Gemini（OpenAI 兼容）
+
+> 说明：自定义接口要求兼容 OpenAI Chat Completions 风格请求。
 
 ### 常用命令
 
