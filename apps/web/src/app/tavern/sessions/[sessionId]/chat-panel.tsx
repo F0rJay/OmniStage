@@ -200,6 +200,27 @@ type ParsedScenePackage = {
 
 type ParsedTranscriptSection = { speaker: string; content: string };
 
+function isLikelyActionTag(name: string): boolean {
+  const n = name.trim();
+  if (!n) return false;
+  if (
+    /^(跟紧|转身带路|停下脚步|保持警惕|观察四周|传到|抵达|到达|继续前进|快走|别走散|小心|准备战斗|撤离|掩护|警戒)$/.test(
+      n
+    )
+  ) {
+    return true;
+  }
+  if (
+    /(环顾|眼神|目光|低声|沉声|抬手|抬眼|抬头|转头|转身|伸手|收手|握紧|松开|叹息|轻声|冷笑|苦笑|点头|摇头|皱眉|挑眉|看向|望向|扫视|打量|后退|上前|迈步|站起|坐下|俯身|起身)/.test(
+      n
+    )
+  ) {
+    return true;
+  }
+  if (/(四周|远处|片刻|半晌|良久|一瞬)$/.test(n)) return true;
+  return false;
+}
+
 function isLikelySpeakerName(name: string): boolean {
   const n = name.trim();
   if (!n) return false;
@@ -209,9 +230,18 @@ function isLikelySpeakerName(name: string): boolean {
   if (/(场景|旁白|日志|条目|记录|补充|章节|目录|系统)/.test(n)) return false;
   // 过滤时间/章节/路线等标签，避免「廷根时期」被误当角色名
   if (/(时期|时代|阶段|年间|纪元|线|篇|卷|章|幕|节)$/.test(n)) return false;
+  if (isLikelyActionTag(n)) return false;
+  // 过滤动作短语被误当抬头（如「站起身」「抬头看向」）
+  if (/(起身|站起|坐下|抬头|低头|转身|回头|点头|摇头|皱眉|沉默|轻笑|苦笑|叹气|看向|望向|走近|后退|举起|放下|握紧|松开)$/.test(n)) return false;
   if (/^场景\s*NPC/.test(n)) return false;
   const badStarts = [
+    "跟",
+    "转",
+    "停",
+    "保",
+    "观",
     "抬",
+    "站",
     "翻",
     "眯",
     "放",
@@ -369,7 +399,7 @@ function parseBracketSpeakerTranscript(content: string): ParsedTranscriptSection
     const onlyMarker = t.match(/^[【\[]([^】\]\n]{1,24})[】\]]\s*$/);
     if (onlyMarker) {
       const nextSpeaker = onlyMarker[1].trim();
-      if (!isLikelySpeakerName(nextSpeaker)) {
+      if (!isLikelySpeakerName(nextSpeaker) || isLikelyActionTag(nextSpeaker)) {
         bucket.push(raw);
         continue;
       }
@@ -381,7 +411,7 @@ function parseBracketSpeakerTranscript(content: string): ParsedTranscriptSection
     const markerWithLine = t.match(/^[【\[]([^】\]\n]{1,24})[】\]]\s*(.+)$/);
     if (markerWithLine) {
       const nextSpeaker = markerWithLine[1].trim();
-      if (!isLikelySpeakerName(nextSpeaker)) {
+      if (!isLikelySpeakerName(nextSpeaker) || isLikelyActionTag(nextSpeaker)) {
         bucket.push(raw);
         continue;
       }
@@ -394,7 +424,7 @@ function parseBracketSpeakerTranscript(content: string): ParsedTranscriptSection
     const m = t.match(/^【([^】\n]{1,24})】\s*$/);
     if (m) {
       const nextSpeaker = m[1].trim();
-      if (!isLikelySpeakerName(nextSpeaker)) {
+      if (!isLikelySpeakerName(nextSpeaker) || isLikelyActionTag(nextSpeaker)) {
         bucket.push(raw);
         continue;
       }
@@ -528,6 +558,7 @@ function parseParentheticalSpeakerTranscript(
   const badNameStarts = [
     "停",
     "微",
+    "站",
     "翻",
     "眯",
     "放",
@@ -612,9 +643,9 @@ function expandAssistantSceneToGroupMessages(base: Message): Message[] {
   if (base.role !== "assistant") return [base];
   // 服务端已通过 [CW_SPEAKER]/【说话者：...】提取了主说话者时，
   // 这条消息应保持单气泡，避免把动作括号行误拆成“新说话者”。
-  const hasRoleHeaderInContent = /(^|\n)\s*【[^】\n]{1,24}】\s*(\n|$)/.test(
-    base.content
-  );
+  const hasRoleHeaderInContent =
+    /(^|\n)\s*【[^】\n]{1,24}】\s*(\n|$)/.test(base.content) ||
+    /(^|\n)\s*\[[^\]\n]{1,24}\]\s*(\n|$)/.test(base.content);
   if (
     base.speakerLabel?.trim() &&
     base.speakerLabel.trim() !== "场景" &&
